@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="scripts/script.js"></script>
+    <script>
+      $(function () {
+        $("#navbar").load("navbar.html", function () {
+          initLogoutButton();
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div id="navbar"></div>
+    <div class="flex px-4 mt-4">
+      <a
+        href="../admin/index.html"
+        class="flex items-center justify-center px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border rounded-lg gap-x-2 dark:hover:bg-gray-800 dark:bg-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:border-gray-700"
+      >
+        <svg
+          class="w-5 h-5 rtl:rotate-180"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18"
+          />
+        </svg>
+        <span>Go back</span>
+      </a>
+    </div>
+    <section
+      class="max-w-4xl p-6 mx-auto bg-indigo-600 rounded-md shadow-md dark:bg-gray-800 mt-20"
+    >
+      <h1 class="text-xl font-bold text-white capitalize dark:text-white">
+        Product Form
+      </h1>
+      <form id="product-form">
+        <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+          <div>
+            <label class="text-white dark:text-gray-200" for="product"
+              >Product</label
+            >
+            <input
+              id="product"
+              type="text"
+              class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring"
+              name="product"
+            />
+          </div>
+
+          <div>
+            <label class="text-white dark:text-gray-200" for="price"
+              >Price</label
+            >
+            <input
+              id="price"
+              type="number"
+              class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring"
+              name="price"
+            />
+          </div>
+
+          <div>
+            <label class="text-white dark:text-gray-200" for="description"
+              >Description</label
+            >
+            <textarea
+              id="description"
+              type="textarea"
+              class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring"
+              name="description"
+            ></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-white"> Image </label>
+            <div
+              class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md"
+            >
+              <div class="space-y-1 text-center">
+                <svg
+                  class="mx-auto h-12 w-12 text-white"
+                  stroke="currentColor"
+                  fill="none"
+                  viewBox="0 0 48 48"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <img
+                  id="image-preview"
+                  class="hidden w-full object-cover overflow-hidden rounded-md bg-gray-200"
+                />
+                <div class="flex text-sm text-gray-600">
+                  <label
+                    for="file-upload"
+                    class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+                  >
+                    <span class="">Upload a file</span>
+                    <input
+                      id="file-upload"
+                      name="file-upload"
+                      type="file"
+                      class="sr-only"
+                    />
+                  </label>
+                  <p class="pl-1 text-white">or drag and drop</p>
+                </div>
+                <p class="text-xs text-white">PNG, JPG, GIF up to 10MB</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end mt-6">
+          <button
+            type="submit"
+            class="px-6 py-2 leading-5 text-white transition-colors duration-200 transform bg-pink-500 rounded-md hover:bg-pink-700 focus:outline-none focus:bg-gray-600"
+          >
+            Save
+          </button>
+          <div id="form-errors" class="text-red-500 text-sm hidden"></div>
+        </div>
+      </form>
+    </section>
+    <script type="text/javascript">
+      const productForm = document.getElementById("product-form");
+
+      productForm.addEventListener("submit", async (event) => {
+        event.preventDefault(); // Prevent default form submission
+
+        // Form validation (implement your specific validation logic)
+        const isValid = validateProductForm();
+        if (!isValid) {
+          return; // Abort submission if form is invalid
+        }
+
+        const formData = new FormData(productForm); // Collect form data
+
+        // Disable "Save" button and show loading indicator
+        productForm.querySelector("button").disabled = true;
+        productForm.querySelector("button").textContent = "Saving...";
+
+        // Send AJAX request to save product using your API endpoint
+        try {
+          const response = await fetch("/your-api-endpoint", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error(
+              `API request failed with status ${response.status}`
+            );
+          }
+
+          const data = await response.json();
+
+          // Handle successful submission (e.g., clear form, show success message)
+          console.log("Product saved successfully:", data);
+          productForm.reset(); // Clear form fields
+          showSuccessMessage("Product saved successfully!");
+        } catch (error) {
+          console.error("Error saving product:", error);
+          // Handle errors (e.g., display error message)
+          showErrorMessages(["Error saving product. Please try again."]);
+        } finally {
+          // Re-enable "Save" button after success or error
+          productForm.querySelector("button").disabled = false;
+          productForm.querySelector("button").textContent = "Save";
+        }
+      });
+
+      // Implement your form validation logic (example)
+      function validateProductForm() {
+        const productName = document.getElementById("product").value.trim();
+        const productPrice = document.getElementById("price").value;
+        const productDescription = document
+          .getElementById("description")
+          .value.trim();
+
+        if (productName === "") {
+          showErrorMessages(["Product name is required."]);
+          return false;
+        }
+
+        if (isNaN(productPrice) || parseFloat(productPrice) <= 0) {
+          showErrorMessages(["Invalid product price."]);
+          return false;
+        }
+
+        if (productDescription === "") {
+          showErrorMessages(["Product description is required."]);
+          return false;
+        }
+
+        return true;
+      }
+
+      // Functions to display error and success messages (example)
+      function showErrorMessages(messages) {
+        const errorContainer = document.getElementById("form-errors");
+        errorContainer.textContent = "";
+        errorContainer.classList.remove("hidden");
+
+        const errorList = document.createElement("ul");
+        messages.forEach((message) => {
+          const errorItem = document.createElement("li");
+          errorItem.textContent = message;
+          errorList.appendChild(errorItem);
+        });
+
+        errorContainer.appendChild(errorList);
+      }
+
+      function showSuccessMessage(message) {
+        // Implement your success message display logic (e.g., alert, toast)
+        alert(message);
+      }
+      const fileUpload = document.getElementById("file-upload");
+      const imagePreview = document.getElementById("image-preview");
+
+      fileUpload.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+
+        // Validate file type (PNG, JPG, JPEG)
+        if (!["image/png", "image/jpeg", "image/jpg"].includes(file.type)) {
+          alert("Invalid file type. Please upload PNG, JPG, or JPEG image.");
+          return;
+        }
+
+        // Check file size (optional)
+        if (file.size > 10 * 1024 * 1024) {
+          // 10MB limit
+          alert(
+            "File size exceeds limit (10MB). Please upload a smaller image."
+          );
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          imagePreview.classList.remove("hidden"); // Show preview image
+          imagePreview.src = event.target.result;
+        };
+
+        reader.readAsDataURL(file);
+      });
+    </script>
+  </body>
+</html>
