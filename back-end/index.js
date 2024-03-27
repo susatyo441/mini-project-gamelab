@@ -1,5 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors");
+const router = require("./src/routes/api.js");
+const { errorMiddleware } = require("./src/middleware/error-middleware.js");
 
 require("dotenv").config();
 
@@ -9,6 +12,9 @@ const app = express();
 app.use(express.json({ extended: false }));
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cors());
+app.use(router);
+app.use(errorMiddleware);
 
 // Routes
 
