@@ -4,6 +4,7 @@ import Landing from '../pages/Landing'
 import Products from '../pages/Products'
 import About from '../pages/About'
 import MainLayout from '../layouts/MainLayout'
+import Order from '../pages/Order'
 
 const Routes = createBrowserRouter([
     {
@@ -12,7 +13,6 @@ const Routes = createBrowserRouter([
         children: [
             {
                 path: '/',
-                children: [],
                 element: <Landing />
             },
             {
