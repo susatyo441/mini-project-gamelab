@@ -56,6 +56,7 @@
               type="text"
               class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring"
               name="product"
+              required
             />
           </div>
 
@@ -68,6 +69,7 @@
               type="number"
               class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring"
               name="price"
+              required
             />
           </div>
 
@@ -80,6 +82,7 @@
               type="textarea"
               class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring"
               name="description"
+              required
             ></textarea>
           </div>
           <div>
@@ -142,11 +145,12 @@
     <div id="loading" class="hidden"></div>
 
     <script type="text/javascript">
+      const token = localStorage.getItem("token");
       document.addEventListener("DOMContentLoaded", function () {
         // Mendapatkan ID produk dari query parameter
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get("id");
-        console.log(productId);
+
         if (productId) {
           fetchData(productId);
         } else {
@@ -161,21 +165,31 @@
         try {
           // Melakukan permintaan GET ke API untuk mendapatkan data produk
           $.ajax({
-            url: "http://localhost/" + productId, // Ganti URL dengan endpoint API Anda
+            url: "http://localhost:3000/" + productId, // Ganti URL dengan endpoint API Anda
             type: "GET",
+            beforeSend: function (xhr) {
+              // Menambahkan header Authorization dengan token bearer
+              xhr.setRequestHeader("Authorization", "Bearer " + token);
+            },
             success: function (response) {
               // Mengisi formulir dengan data produk yang diterima
               populateForm(response);
             },
             error: function (xhr, status, error) {
-              console.error("Terjadi kesalahan:", error);
+              if (xhr.status === 401) {
+                // Jika respons adalah 401, redirect ke halaman login
+                window.location.href = "login.html";
+              } else {
+                console.error("Terjadi kesalahan:", error);
+              }
+            },
+            complete: function () {
+              // Menyembunyikan loading skeleton setelah permintaan selesai
+              $("#loading").addClass("hidden");
             },
           });
         } catch (error) {
           console.error("Terjadi kesalahan:", error);
-        } finally {
-          // Menyembunyikan loading skeleton setelah permintaan selesai
-          $("#loading").addClass("hidden");
         }
       }
 
@@ -196,6 +210,9 @@
 
       productForm.addEventListener("submit", async (event) => {
         event.preventDefault(); // Prevent default form submission
+        $("#loading").removeClass("hidden");
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get("id");
 
         // Form validation (implement your specific validation logic)
         const isValid = validateProductForm();
@@ -211,12 +228,25 @@
 
         // Send AJAX request to save product using your API endpoint
         try {
-          const response = await fetch("/your-api-endpoint", {
-            method: "POST",
-            body: formData,
-          });
+          const response = await fetch(
+            `http://localhost:3000/${
+              productId ? "update/" + productId : "create"
+            }`,
+            {
+              method: "POST",
+              body: formData,
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
           if (!response.ok) {
+            if (response.status === 401) {
+              // Jika respons adalah 401 (Unauthorized), arahkan pengguna ke halaman login
+              window.location.href = "login.html";
+              return;
+            }
             throw new Error(
               `API request failed with status ${response.status}`
             );
@@ -224,8 +254,6 @@
 
           const data = await response.json();
 
-          // Handle successful submission (e.g., clear form, show success message)
-          console.log("Product saved successfully:", data);
           productForm.reset(); // Clear form fields
           showSuccessMessage("Product saved successfully!");
         } catch (error) {
@@ -233,9 +261,8 @@
           // Handle errors (e.g., display error message)
           showErrorMessages(["Error saving product. Please try again."]);
         } finally {
-          // Re-enable "Save" button after success or error
-          productForm.querySelector("button").disabled = false;
-          productForm.querySelector("button").textContent = "Save";
+          $("#loading").addClass("hidden");
+          window.location.href = "index.html";
         }
       });
 

@@ -64,7 +64,7 @@
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="product-table-body">
           <tr class="bg-gray-800 border-b border-gray-700 hover:bg-gray-700">
             <td class="p-4">
               <img
@@ -81,7 +81,7 @@
               $999
             </td>
             <td class="pr-2 text-right">
-              <button>
+              <button onclick="window.location.href = 'create.html?id=1'">
                 <svg
                   class="w-6 h-6 text-yellow-600 hover:text-yellow-800"
                   aria-hidden="true"
@@ -197,17 +197,17 @@
     <div id="loading" class="hidden"></div>
 
     <script type="text/javascript">
-      window.openModal = function (modalId, userId) {
+      const token = localStorage.getItem("token");
+      window.openModal = function (modalId, postId) {
         const modal = document.getElementById(modalId);
         modal.style.display = "block";
         document
           .getElementsByTagName("body")[0]
           .classList.add("overflow-y-hidden");
-        const deleteId = userId;
         modal.addEventListener("click", (event) => {
           if (event.target.textContent.trim() === "Yes, I'm sure") {
             // Send AJAX request to delete user data
-            sendDeleteRequest(deleteId);
+            sendDeleteRequest(postId);
 
             // Close modal after successful deletion (replace with your success logic)
             closeModal("modelConfirm");
@@ -236,26 +236,108 @@
         }
       };
 
-      function sendDeleteRequest(userId) {
-        const xhr = new XMLHttpRequest();
-        xhr.open("DELETE", `your-delete-endpoint/${userId}`); // Replace with your actual endpoint URL
-        xhr.setRequestHeader("Content-Type", "application/json"); // Assuming JSON data
-        xhr.onload = function () {
-          if (xhr.status === 200) {
-            // Handle successful deletion (e.g., remove user entry from UI, show a success message)
-            console.log("User deleted successfully");
-          } else {
-            // Handle errors (e.g., show an error message)
-            console.error("Delete request failed:", xhr.statusText);
-          }
-        };
+      function sendDeleteRequest(productId) {
+        try {
+          // Menampilkan loading skeleton sebelum melakukan permintaan
+          document.getElementById("loading").classList.remove("hidden");
 
-        xhr.onerror = function () {
-          console.error("Delete request failed (network error)");
-        };
+          // Mengambil token dari localStorage
+          const token = localStorage.getItem("token");
 
-        xhr.send(); // Optionally, send data in the request body if needed
+          const xhr = new XMLHttpRequest();
+          xhr.open("DELETE", `http://localhost:3000/delete/${productId}`); // Ganti dengan URL endpoint delete Anda
+          xhr.setRequestHeader("Content-Type", "application/json"); // Mengasumsikan data JSON
+          xhr.setRequestHeader("Authorization", "Bearer " + token);
+
+          xhr.onload = function () {
+            if (xhr.status === 200) {
+              // Handle successful deletion (e.g., remove user entry from UI, show a success message)
+              console.log("User deleted successfully");
+            } else if (xhr.status === 401) {
+              // Redirect ke halaman login jika respons adalah 401
+              window.location.href = "login.html";
+            } else {
+              // Handle other errors (e.g., show an error message)
+              console.error("Delete request failed:", xhr.statusText);
+            }
+          };
+
+          xhr.onerror = function () {
+            console.error("Delete request failed (network error)");
+          };
+
+          xhr.send(); // Opsi: kirim data dalam body permintaan jika diperlukan
+        } catch (error) {
+          console.error("Terjadi kesalahan:", error);
+        } finally {
+          // Menyembunyikan loading skeleton setelah permintaan selesai
+          document.getElementById("loading").classList.add("hidden");
+        }
       }
+
+      document.addEventListener("DOMContentLoaded", async function () {
+        const tableBody = document.getElementById("product-table-body");
+        const loading = document.getElementById("loading");
+
+        try {
+          loading.classList.remove("hidden");
+          const response = await fetch("http://localhost:3000/products", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (!response.ok) {
+            if (response.status === 401) {
+              // Jika respons adalah 401 (Unauthorized), arahkan pengguna ke halaman login
+              window.location.href = "login.html";
+              return;
+            }
+            throw new Error("Failed to fetch data");
+          }
+          const products = await response.json();
+
+          tableBody.innerHTML = ""; // Kosongkan isi tabel sebelum menambahkan data baru
+
+          products.forEach((product) => {
+            const row = document.createElement("tr");
+            row.classList.add(
+              "bg-gray-800",
+              "border-b",
+              "border-gray-700",
+              "hover:bg-gray-700"
+            );
+
+            row.innerHTML = `
+          <td class="p-4">
+            <img src="${product.image}" class="w-16 md:w-32 max-w-full max-h-full" alt="${product.name}" />
+          </td>
+          <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">${product.name}</td>
+          <td class="px-6 py-4">${product.description}</td>
+          <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">${product.price}</td>
+          <td class="pr-2 text-right">
+            <button onclick="window.location.href = 'create.html?id=${product.id}'">
+              <svg class="w-6 h-6 text-yellow-600 hover:text-yellow-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" d="M14 4.182A4.136 4.136 0 0 1 16.9 3c1.087 0 2.13.425 2.899 1.182A4.01 4.01 0 0 1 21 7.037c0 1.068-.43 2.092-1.194 2.849L18.5 11.214l-5.8-5.71 1.287-1.31.012-.012Zm-2.717 2.763L6.186 12.13l2.175 2.141 5.063-5.218-2.141-2.108Zm-6.25 6.886-1.98 5.849a.992.992 0 0 0 .245 1.026 1.03 1.03 0 0 0 1.043.242L10.282 19l-5.25-5.168Zm6.954 4.01 5.096-5.186-2.218-2.183-5.063 5.218 2.185 2.15Z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+          </td>
+          <td class="pl-2 text-left">
+            <button type="button" onclick="openModal('modelConfirm', ${product.id})" class="font-medium">
+              <svg class="w-6 h-6 text-red-600 hover:text-red-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" d="M8.586 2.586A2 2 0 0 1 10 2h4a2 2 0 0 1 2 2v2h3a1 1 0 1 1 0 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a1 1 0 0 1 0-2h3V4a2 2 0 0 1 .586-1.414ZM10 6h4V4h-4v2Zm1 4a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Zm4 0a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+          </td>
+        `;
+
+            tableBody.appendChild(row);
+          });
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        } finally {
+          loading.classList.add("hidden");
+        }
+      });
     </script>
   </body>
 </html>
