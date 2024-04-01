@@ -12,10 +12,11 @@
         $("#navbar").load("navbar.html", function () {
           initLogoutButton();
         });
+        $("#loading").load("loading.html", function () {});
       });
     </script>
   </head>
-  <body>
+  <body class="overflow-hidden">
     <!-- NAVBAR -->
     <div id="navbar"></div>
     <div class="flex justify-end py-4 px-4 mt-4">
@@ -191,6 +192,9 @@
         </div>
       </div>
     </div>
+
+    <!-- Loader -->
+    <div id="loading" class="hidden"></div>
 
     <script type="text/javascript">
       window.openModal = function (modalId, userId) {

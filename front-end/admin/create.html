@@ -138,7 +138,60 @@
         </div>
       </form>
     </section>
+
+    <div id="loading" class="hidden"></div>
+
     <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", function () {
+        // Mendapatkan ID produk dari query parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get("id");
+        console.log(productId);
+        if (productId) {
+          fetchData(productId);
+        } else {
+          console.error("ID produk tidak ditemukan dalam URL.");
+        }
+      });
+
+      function fetchData(productId) {
+        // Menampilkan loading skeleton
+        $("#loading").removeClass("hidden");
+
+        try {
+          // Melakukan permintaan GET ke API untuk mendapatkan data produk
+          $.ajax({
+            url: "http://localhost/" + productId, // Ganti URL dengan endpoint API Anda
+            type: "GET",
+            success: function (response) {
+              // Mengisi formulir dengan data produk yang diterima
+              populateForm(response);
+            },
+            error: function (xhr, status, error) {
+              console.error("Terjadi kesalahan:", error);
+            },
+          });
+        } catch (error) {
+          console.error("Terjadi kesalahan:", error);
+        } finally {
+          // Menyembunyikan loading skeleton setelah permintaan selesai
+          $("#loading").addClass("hidden");
+        }
+      }
+
+      function populateForm(productData) {
+        // Mengisi nilai input formulir dengan data produk yang diterima
+        document.getElementById("product").value = productData.product;
+        document.getElementById("price").value = productData.price;
+        document.getElementById("description").value = productData.description;
+
+        if (productData.image) {
+          var imagePreview = document.getElementById("image-preview");
+          imagePreview.src = productData.image;
+          imagePreview.classList.remove("hidden");
+        }
+      }
+
       const productForm = document.getElementById("product-form");
 
       productForm.addEventListener("submit", async (event) => {
