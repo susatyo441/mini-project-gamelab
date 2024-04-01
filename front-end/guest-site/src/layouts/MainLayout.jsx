@@ -7,6 +7,9 @@ const MainLayout = () => {
         <>
             <Navbar/>
             <Outlet/>
+            <footer className='bg-red-600 min-h-48'>
+                
+            </footer>
         </>
     )
 }
