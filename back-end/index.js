@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const router = require("./src/routes/api.js");
 const { errorMiddleware } = require("./src/middleware/error-middleware.js");
-
 require("dotenv").config();
 
 const app = express();

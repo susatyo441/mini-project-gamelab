@@ -30,9 +30,6 @@ const login = async (req, res, next) => {
             password: userExists.password,
         };
         const token = generateAccessToken(usr);
-        // const refreshToken = generateRefreshToken(usr);
-
-
         await User.update(
             {
                 token: token
