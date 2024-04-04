@@ -21,7 +21,7 @@ router.get("/products", getAllProducts);
 router.post("/products", authentication, upload.single("gambar"), createProduct);
 router.put("/products/:id", authentication, upload.single("gambar"), updateProduct);
 router.delete("/products/:id", authentication, deleteProduct);
-router.get("/products/search", authentication, getProductsByName);
-router.get("/products/:id", authentication, getProductById);
+router.get("/products/search",  getProductsByName);
+router.get("/products/:id", getProductById);
 
 module.exports = router;
