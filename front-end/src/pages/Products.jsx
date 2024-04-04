@@ -1,7 +1,9 @@
-import React from 'react';
-import ProductList from '../components/product/ProductList';
+import React, { useEffect } from 'react'
+import ProductList from '../components/product/ProductList'
+import axios from 'axios'
 
 const Products = () => {
+  axios.get('')
   const dummyProducts = [
     {
       id: 1,
@@ -67,6 +69,10 @@ const Products = () => {
       gambar: './images/dummy.jpg',
     },
   ];
+
+  useEffect(() => {
+    
+  }, [])
 
   return (
     <div className="h-full mx-auto mt-20">

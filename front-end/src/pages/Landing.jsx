@@ -21,7 +21,7 @@ const Landing = () => {
                     </div>
                     <div className='mx-3 absolute md:relative md:block md:w-1/2 h-full flex flex-col items-center justify-center align-middle -z-10'>
                         <div className="w-3/4 h-full">
-                            <img className='w-full' width='100%' src="./images/spices.png" alt="" srcset="" />
+                            <img className='w-full' width='100%' src="./images/spices.png" alt="" srcSet="" />
                         </div>
                     </div>
                 </div>
