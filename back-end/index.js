@@ -4,20 +4,22 @@ const cors = require("cors");
 const router = require("./src/routes/api.js");
 const { errorMiddleware } = require("./src/middleware/error-middleware.js");
 require("dotenv").config();
-var multer = require("multer");
-var upload = multer();
+
+const path = require('path');
 
 const app = express();
 
 // Middleware
-app.use(express.static("uploads"));
 app.use(express.json({ extended: false }));
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 app.use(router);
 app.use(errorMiddleware);
-app.use(upload.array());
+
+const dirname = path.dirname(__filename);
+app.use('/uploads', express.static(path.join(dirname, 'uploads')));
+
 // Routes
 
 const PORT = 3000;
