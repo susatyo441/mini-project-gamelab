@@ -55,8 +55,9 @@
               id="product"
               type="text"
               class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring"
-              name="product"
+              name="product_name"
               required
+              placeholder="Nama Produk"
             />
           </div>
 
@@ -65,11 +66,14 @@
               >Price</label
             >
             <input
-              id="price"
-              type="number"
-              class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring"
+              type="text"
               name="price"
-              required
+              id="price"
+              pattern="^\Rp\d{1,3}(,\d{3})*(\.\d+)?Rp"
+              value=""
+              data-type="currency"
+              class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring"
+              placeholder="Rp1,000,000.00"
             />
           </div>
 
@@ -83,6 +87,7 @@
               class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring"
               name="description"
               required
+              placeholder="Deskripsi"
             ></textarea>
           </div>
           <div>
@@ -117,7 +122,7 @@
                     <span class="">Upload a file</span>
                     <input
                       id="file-upload"
-                      name="file-upload"
+                      name="gambar"
                       type="file"
                       class="sr-only"
                     />
@@ -165,7 +170,7 @@
         try {
           // Melakukan permintaan GET ke API untuk mendapatkan data produk
           $.ajax({
-            url: "http://localhost:3000/" + productId, // Ganti URL dengan endpoint API Anda
+            url: "http://localhost:3000/products/" + productId, // Ganti URL dengan endpoint API Anda
             type: "GET",
             beforeSend: function (xhr) {
               // Menambahkan header Authorization dengan token bearer
@@ -195,13 +200,15 @@
 
       function populateForm(productData) {
         // Mengisi nilai input formulir dengan data produk yang diterima
-        document.getElementById("product").value = productData.product;
-        document.getElementById("price").value = productData.price;
+        document.getElementById("product").value = productData.product_name;
+        const priceInput = document.getElementById("price");
+        priceInput.value = productData.price;
+
         document.getElementById("description").value = productData.description;
 
-        if (productData.image) {
+        if (productData.gambar) {
           var imagePreview = document.getElementById("image-preview");
-          imagePreview.src = productData.image;
+          imagePreview.src = `http://localhost:3000/${productData.gambar}`;
           imagePreview.classList.remove("hidden");
         }
       }
@@ -214,11 +221,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get("id");
 
-        // Form validation (implement your specific validation logic)
-        const isValid = validateProductForm();
-        if (!isValid) {
-          return; // Abort submission if form is invalid
-        }
+        const priceInput = document.getElementById("price");
+        const priceValue = parseFloat(
+          priceInput.value.replace(/[^0-9]/g, "").replace(/(\d+)(00)$/, "$1")
+        );
+
+        productForm.price.value = priceValue;
 
         const formData = new FormData(productForm); // Collect form data
 
@@ -230,10 +238,10 @@
         try {
           const response = await fetch(
             `http://localhost:3000/${
-              productId ? "update/" + productId : "create"
+              productId ? "products/" + productId : "products"
             }`,
             {
-              method: "POST",
+              method: `${productId ? "PUT" : "POST"}`,
               body: formData,
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -270,6 +278,7 @@
       function validateProductForm() {
         const productName = document.getElementById("product").value.trim();
         const productPrice = document.getElementById("price").value;
+        console.log(productPrice);
         const productDescription = document
           .getElementById("description")
           .value.trim();
@@ -341,6 +350,87 @@
 
         reader.readAsDataURL(file);
       });
+
+      $("input[data-type='currency']").on({
+        keyup: function () {
+          formatCurrency($(this));
+        },
+        blur: function () {
+          formatCurrency($(this), "blur");
+        },
+      });
+
+      function formatNumber(n) {
+        // format number 1000000 to 1,234,567
+        return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+
+      function formatCurrency(input, blur) {
+        // appends $ to value, validates decimal side
+        // and puts cursor back in right position.
+
+        // get input value
+        var input_val = input.val();
+
+        // don't validate empty input
+        if (input_val === "") {
+          return;
+        }
+
+        // original length
+        var original_len = input_val.length;
+
+        // initial caret position
+        var caret_pos = input.prop("selectionStart");
+
+        // check for decimal
+        if (input_val.indexOf(".") >= 0) {
+          // get position of first decimal
+          // this prevents multiple decimals from
+          // being entered
+          var decimal_pos = input_val.indexOf(".");
+
+          // split number by decimal point
+          var left_side = input_val.substring(0, decimal_pos);
+          var right_side = input_val.substring(decimal_pos);
+
+          // add commas to left side of number
+          left_side = formatNumber(left_side);
+
+          // validate right side
+          right_side = formatNumber(right_side);
+
+          // On blur make sure 2 numbers after decimal
+          if (blur === "blur") {
+            right_side += "00";
+          }
+
+          // Limit decimal to only 2 digits
+          right_side = right_side.substring(0, 2);
+
+          // join number by .
+          input_val = "Rp" + left_side + "." + right_side;
+        } else {
+          // no decimal entered
+          // add commas to number
+          // remove all non-digits
+          input_val = formatNumber(input_val);
+          input_val = "Rp" + input_val;
+
+          // final formatting
+          if (blur === "blur") {
+            input_val += ".00";
+          }
+        }
+
+        // send updated string to input
+        input.val(input_val);
+
+        // put caret back in the right position
+        var updated_len = input_val.length;
+        caret_pos = updated_len - original_len + caret_pos;
+        input[0].setSelectionRange(caret_pos, caret_pos);
+      }
     </script>
   </body>
 </html>
