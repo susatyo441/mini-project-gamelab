@@ -9,11 +9,15 @@ const path = require('path');
 
 const app = express();
 
+var corsOption = {
+  origin: 'https://sambalbagindo.carolynn.my.id'
+}
+
 // Middleware
 app.use(express.json({ extended: false }));
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors(corsOption));
 app.use(router);
 app.use(errorMiddleware);
 
