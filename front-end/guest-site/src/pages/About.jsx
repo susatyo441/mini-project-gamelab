@@ -1,13 +1,16 @@
-import React from 'react'
+import React from 'react';
+import HeroSection from '../components/about/Hero';
+import VisionMissionSection from '../components/about/Vision';
+import PrestasiSection from '../components/about/Prestasi';
 
 const About = () => {
-    return (
-        <div className='main'>
-            <section className='py-10'>
-                <div className="bg-red-200"></div>
-            </section>
-        </div>
-    )
-}
+  return (
+    <div className="flex flex-wrap items-center justify-center h-full">
+      <HeroSection />
+      <VisionMissionSection />
+      <PrestasiSection />
+    </div>
+  );
+};
 
-export default About
+export default About;
