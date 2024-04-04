@@ -16,8 +16,8 @@ const router = express.Router();
 router.post("/login", userController.login);
 router.post("/logout", authentication, userController.logout);
 
-
-router.get("/products", authentication, getAllProducts);
+// router.get("/products", authentication, getAllProducts);
+router.get("/products", getAllProducts);
 router.post("/products", authentication, upload.single("gambar"), createProduct);
 router.put("/products/:id", authentication, upload.single("gambar"), updateProduct);
 router.delete("/products/:id", authentication, deleteProduct);
