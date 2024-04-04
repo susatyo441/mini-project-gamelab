@@ -6,7 +6,9 @@
     <title>Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="config.js"></script>
     <script src="scripts/script.js"></script>
+
     <script>
       $(function () {
         $("#navbar").load("navbar.html", function () {
@@ -19,11 +21,12 @@
   <body class="overflow-hidden">
     <!-- NAVBAR -->
     <div id="navbar"></div>
+
     <div class="flex justify-end py-4 px-4 mt-4">
       <div class="w-auto h-auto">
         <div class="flex-1 h-full">
           <a
-            href="create.html"
+            href="./create.html"
             class="flex items-center justify-center flex-1 h-full p-2 bg-green-500 hover:bg-green-800 text-white shadow rounded-full cursor-pointer"
           >
             <div class="relative">
@@ -138,7 +141,6 @@
     <div id="loading" class="hidden"></div>
 
     <script type="text/javascript">
-      const token = localStorage.getItem("token");
       window.openModal = function (modalId, postId) {
         const modal = document.getElementById(modalId);
         modal.style.display = "block";
@@ -147,10 +149,7 @@
           .classList.add("overflow-y-hidden");
         modal.addEventListener("click", (event) => {
           if (event.target.textContent.trim() === "Yes, I'm sure") {
-            // Send AJAX request to delete user data
             sendDeleteRequest(postId);
-
-            // Close modal after successful deletion (replace with your success logic)
             closeModal("modelConfirm");
           }
         });
@@ -179,27 +178,20 @@
 
       function sendDeleteRequest(productId) {
         try {
-          // Menampilkan loading skeleton sebelum melakukan permintaan
           document.getElementById("loading").classList.remove("hidden");
 
-          // Mengambil token dari localStorage
-          const token = localStorage.getItem("token");
-
           const xhr = new XMLHttpRequest();
-          xhr.open("DELETE", `http://localhost:3000/products/${productId}`); // Ganti dengan URL endpoint delete Anda
+          xhr.open("DELETE", `${API_URL}/products/${productId}`); // Ganti dengan URL endpoint delete Anda
           xhr.setRequestHeader("Content-Type", "application/json"); // Mengasumsikan data JSON
           xhr.setRequestHeader("Authorization", "Bearer " + token);
 
           xhr.onload = function () {
             if (xhr.status === 200) {
-              // Handle successful deletion (e.g., remove user entry from UI, show a success message)
               console.log("User deleted successfully");
               window.location.reload();
             } else if (xhr.status === 401) {
-              // Redirect ke halaman login jika respons adalah 401
               window.location.href = "login.html";
             } else {
-              // Handle other errors (e.g., show an error message)
               console.error("Delete request failed:", xhr.statusText);
             }
           };
@@ -208,11 +200,10 @@
             console.error("Delete request failed (network error)");
           };
 
-          xhr.send(); // Opsi: kirim data dalam body permintaan jika diperlukan
+          xhr.send();
         } catch (error) {
           console.error("Terjadi kesalahan:", error);
         } finally {
-          // Menyembunyikan loading skeleton setelah permintaan selesai
           document.getElementById("loading").classList.add("hidden");
         }
       }
@@ -223,14 +214,13 @@
 
         try {
           loading.classList.remove("hidden");
-          const response = await fetch("http://localhost:3000/products", {
+          const response = await fetch(`${API_URL}/products`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
           if (!response.ok) {
             if (response.status === 401) {
-              // Jika respons adalah 401 (Unauthorized), arahkan pengguna ke halaman login
               window.location.href = "login.html";
               return;
             }
@@ -238,7 +228,7 @@
           }
           const products = await response.json();
 
-          tableBody.innerHTML = ""; // Kosongkan isi tabel sebelum menambahkan data baru
+          tableBody.innerHTML = "";
 
           products.forEach((product) => {
             const row = document.createElement("tr");
@@ -255,7 +245,7 @@
             const displayPrice = formattedPrice.replace(/\.\d{2}$/, "");
             row.innerHTML = `
           <td class="p-4">
-            <img src="http://localhost:3000/${product.gambar}" class="w-16 md:w-32 max-w-full max-h-full" alt="${product.product_name}" />
+            <img src="${API_URL}/uploads/${product.gambar}" class="w-16 md:w-32 max-w-full max-h-full" alt="${product.product_name}" />
           </td>
           <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">${product.product_name}</td>
           <td class="px-6 py-4">${product.description}</td>
