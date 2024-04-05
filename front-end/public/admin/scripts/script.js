@@ -14,7 +14,7 @@ function initLogoutButton() {
     xhr.onload = function () {
       if (xhr.status >= 200 && xhr.status < 300) {
         localStorage.removeItem("token");
-        window.location.href = "login.html";
+        window.location.href = "/admin/login.html";
       } else {
         console.error("Logout gagal:", xhr.statusText);
         alert("Logout gagal. Silakan coba lagi.");
@@ -36,7 +36,7 @@ async function validateLogin() {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      window.location.href = "login.html";
+      window.location.href = "/admin/login.html";
       return;
     }
 
@@ -51,7 +51,7 @@ async function validateLogin() {
 
     if (!response.ok) {
       if (response.status === 401) {
-        window.location.href = "login.html";
+        window.location.href = "/admin/login.html";
         return;
       }
     }

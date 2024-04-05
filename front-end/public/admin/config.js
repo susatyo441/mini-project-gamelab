@@ -1,2 +1,2 @@
-const API_URL = "https://api.carolynn.my.id";
+const API_URL = "http://localhost:3000";
 const token = localStorage.getItem("token");

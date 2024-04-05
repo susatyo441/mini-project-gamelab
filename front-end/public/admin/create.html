@@ -6,12 +6,12 @@
     <title>Admin Form</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script src="./config.js"></script>
-    <script src="./scripts/script.js"></script>
+    <script src="/admin/config.js"></script>
+    <script src="/admin/scripts/script.js"></script>
 
     <script>
       $(function () {
-        $("#navbar").load("navbar.html", function () {
+        $("#navbar").load("/admin/navbar.html", function () {
           initLogoutButton();
         });
       });
@@ -180,7 +180,7 @@
             },
             error: function (xhr, status, error) {
               if (xhr.status === 401) {
-                window.location.href = "login.html";
+                window.location.href = "/admin/login.html";
               } else {
                 console.error("Terjadi kesalahan:", error);
               }
@@ -242,7 +242,7 @@
 
           if (!response.ok) {
             if (response.status === 401) {
-              window.location.href = "login.html";
+              window.location.href = "/admin/login.html";
               return;
             }
             throw new Error(
@@ -260,7 +260,7 @@
           showErrorMessages(["Error saving product. Please try again."]);
         } finally {
           $("#loading").addClass("hidden");
-          window.location.href = "index.html";
+          window.location.href = "/admin/index.html";
         }
       });
 

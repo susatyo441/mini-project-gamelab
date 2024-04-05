@@ -4,10 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login Admin</title>
-    <base href="http://localhost:8080/admin">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script src="config.js"></script>
+    <script src="/admin/config.js"></script>
   </head>
   <body class="h-full">
     <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
@@ -102,7 +101,7 @@
               // Simpan token ke localStorage
               localStorage.setItem("token", response.data.token);
 
-              window.location.href = "index.html";
+              window.location.href = "/admin/index.html";
             } else if (xhr.status === 401) {
               // Email atau password salah
               console.error("Email atau password salah.");

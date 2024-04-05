@@ -10,7 +10,7 @@ const path = require('path');
 const app = express();
 
 var corsOption = {
-  origin: 'https://sambalbagindo.carolynn.my.id'
+  origin: '*'
 }
 
 // Middleware
